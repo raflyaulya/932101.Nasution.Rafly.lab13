@@ -1,50 +1,68 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using _932101.Nasution.Rafly.lab13.Models;
-using _932003.Tanumikhardzha.Rafael.lab13.Models;
+using _932101.Nasution.Rafly.lab13.Services;
 
 namespace _932101.Nasution.Rafly.lab13.Controllers
 {
     public class HomeController : Controller
     {
+        private readonly ILogger<HomeController> _logger;
+
+        private IQuizService _quizService;
+
+        public HomeController(ILogger<HomeController> logger, IQuizService quizService)
+        {
+            _logger = logger;
+            _quizService = quizService;
+        }
+
         public IActionResult Index()
         {
             return View();
         }
 
-        static readonly Model quiz = new Model();
-
+        [HttpGet, ActionName("Quiz")]
         public IActionResult Quiz()
         {
-            quiz.SetRandomValues();
-            ViewBag.Question = quiz.question;
-            return View();
+            Quiz quiz = _quizService.getCurrentQuiz();
+            quiz.reset();
+            _quizService.addNewQuestion(quiz);
+
+            return View("QuizQuestion", new QuizModel(quiz));
         }
 
-        public IActionResult QuizResult()
+        [HttpGet]
+        public IActionResult GetResults()
         {
-            ViewBag.RightAnswersCount = quiz.rightAnswersCount;
-            ViewBag.AnswersCount = quiz.answersCount;
-            ViewBag.Results = quiz.Results;
-            return View();
+            Quiz quiz = _quizService.getCurrentQuiz();
+            return View("Result", quiz);
         }
 
-        [HttpPost]
-        public IActionResult NextQuestion(int answer)
+        [HttpPost, ActionName("Quiz")]
+        public IActionResult Quiz(int answer, string action)
         {
-            quiz.UpdateResults(answer);
-            quiz.SetRandomValues();
-            ViewBag.Question = quiz.question;
-            return View("Quiz");
+            Quiz quiz = _quizService.getCurrentQuiz();
+
+            if (!ModelState.IsValid)
+            {
+                QuizQuestion question = _quizService.getCurrentQuestion(quiz);
+                return View("QuizQuestion", new QuizModel(quiz));
+            }
+            _quizService.answerLastQuestion(new QuizQuestionAnswer(answer), quiz);
+            if (action == "next")
+            {
+                QuizQuestion question = _quizService.addNewQuestion(quiz);
+                return View("QuizQuestion", new QuizModel(quiz));
+            }
+            return View("Result", quiz);
         }
 
-        public IActionResult Finish(int answer)
+
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+        public IActionResult Error()
         {
-            quiz.UpdateResults(answer);
-            ViewBag.RightAnswersCount = quiz.rightAnswersCount;
-            ViewBag.AnswersCount = quiz.answersCount;
-            ViewBag.Results = quiz.Results;
-            return View("QuizResult");
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }
