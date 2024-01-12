@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("932101.Nasution.Rafly.lab13")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7b58f7d82fe96d61b99db054f3092bcf5f2c86fb")]
 [assembly: System.Reflection.AssemblyProductAttribute("932101.Nasution.Rafly.lab13")]
 [assembly: System.Reflection.AssemblyTitleAttribute("932101.Nasution.Rafly.lab13")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
